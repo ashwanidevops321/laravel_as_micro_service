@@ -3,6 +3,7 @@ FROM composer:2 AS vendor
 WORKDIR /app
 
 COPY composer.json composer.lock ./
+COPY package.json package-lock.json ./
 RUN composer install --no-dev --no-scripts --no-progress --no-interaction
 
 # Stage 2: Node build
