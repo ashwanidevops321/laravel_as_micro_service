@@ -2,7 +2,7 @@ version: "3.8"
 
 services:
   app:
-    image: ashwanidevops321/lv:latest
+    image: ashwanidevops321/lv::${BUILD_ID}
     container_name: lv_app
     volumes:
       - ./app:/var/www/html
