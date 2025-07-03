@@ -21,7 +21,7 @@ pipeline {
                 script {
                     docker.withRegistry('https://index.docker.io/v1/', DOCKER_CREDENTIALS_ID) {
                         def appImage = docker.build("${DOCKER_IMAGE_NAME}:${env.BUILD_ID}", "-f Dockerfile .")
-                        appImage.push()
+                        appImage.push('latest')
                     }
                 }
             }
