@@ -25,8 +25,8 @@ WORKDIR /app
 
 # PHP extensions
 RUN apk add --no-cache \
+    freetype-dev \
     git \
-    libfreetype6-dev \
     libjpeg-turbo-dev \
     libpng-dev \
     libwebp-dev \
@@ -34,9 +34,9 @@ RUN apk add --no-cache \
     unzip \
     zip && \
     docker-php-ext-configure gd \
-    --with-freetype=/usr/include/ \
-    --with-jpeg=/usr/include/ \
-    --with-webp=/usr/include/ && \
+    --with-freetype \
+    --with-jpeg \
+    --with-webp && \
     docker-php-ext-install \
     pdo_mysql \
     gd \
