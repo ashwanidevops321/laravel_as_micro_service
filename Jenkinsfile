@@ -5,6 +5,7 @@ pipeline {
         DOCKER_CREDENTIALS_ID = 'dockerhub-credentials'
         SSH_CREDENTIALS_ID    = 'ssh-key-id-in-jenkins'
         SCRIPT                = 'docker-compose.yml'
+        NGINX_CONFIG          = 'nginx.conf'
         DOCKER_IMAGE_NAME     = 'ashwanidevops321/lv_app'
         DEPLOY_PATH_2         = '/home/ubuntu/lv_app'
     }
@@ -41,6 +42,7 @@ pipeline {
                             sh """
                                 ssh -o StrictHostKeyChecking=no ${DEPLOY_USER}@${DEPLOY_HOST} 'mkdir -p ${DEPLOY_PATH_2}'
                                 scp ${SCRIPT} ${DEPLOY_USER}@${DEPLOY_HOST}:${DEPLOY_PATH_2}/docker-compose.yml
+                                scp ${NGINX_CONFIG} ${DEPLOY_USER}@${DEPLOY_HOST}:${DEPLOY_PATH_2}/nginx.conf
                                 echo "🚀 Deploying containers on remote server..."
                                 ssh -o StrictHostKeyChecking=no ${DEPLOY_USER}@${DEPLOY_HOST} '
                                     set -e
