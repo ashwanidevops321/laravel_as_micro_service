@@ -2,14 +2,13 @@
 FROM composer:2 AS vendor
 WORKDIR /app
 
-COPY package.json package.lock ./
+COPY composer.json composer.lock ./
 RUN composer install --no-dev --no-scripts --no-progress --no-interaction
 
 # Stage 2: Node build
 FROM node:20.11.1-alpine AS node
 WORKDIR /app
 
-COPY package.json package-lock.json ./
 RUN npm install --no-audit --no-fund --prefer-offline
 
 COPY . .
