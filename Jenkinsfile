@@ -7,6 +7,7 @@ pipeline {
         NGINX_CONFIG          = 'nginx.conf'
         DOCKER_IMAGE_NAME     = 'ashwanidevops321/lv_app'
         DEPLOY_PATH           = '/home/ubuntu/lv_app'
+        SCRIPT                = 'docker-compose.yml'
     }
 
     stages {
@@ -42,21 +43,17 @@ pipeline {
                                 '
 
                                 # Copy only nginx.conf to server
+                                scp ${SCRIPT} ${DEPLOY_USER}@${DEPLOY_HOST}:${DEPLOY_PATH}/docker-compose.yml
                                 scp ${NGINX_CONFIG} ${DEPLOY_USER}@${DEPLOY_HOST}:${DEPLOY_PATH}/nginx.conf
 
                                 # Run container using latest image and mounted nginx.conf
-                                ssh ${DEPLOY_USER}@${DEPLOY_HOST} '
-                                    docker rm -f lv_nginx || true
-                                    docker run -d --name lv_nginx \\
-                                        -p 8000:9090 \\
-                                        -v ${DEPLOY_PATH}/nginx.conf:/etc/nginx/conf.d/default.conf \\
-                                        nginx:alpine
-
-                                    docker rm -f lv_app || true
-                                    docker run -d --name lv_app \\
-                                        -e ENV=prod \\
-                                        -p 9000:9000 \\
-                                        ${DOCKER_IMAGE_NAME}:${env.BUILD_ID}
+                                echo "🚀 Deploying containers on remote server..."
+                                ssh -o StrictHostKeyChecking=no ${DEPLOY_USER}@${DEPLOY_HOST} '
+                                    set -e
+                                    cd ${DEPLOY_PATH} &&
+                                    docker-compose pull &&
+                                    docker-compose down &&
+                                    docker-compose up -d --remove-orphans
                                 '
                             """
                         }
