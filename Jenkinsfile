@@ -30,37 +30,36 @@ pipeline {
         }
 
         stage('Deploy NGINX Config & Run') {
-            steps {
-                withCredentials([
-                    string(credentialsId: 'deploy-user', variable: 'DEPLOY_USER'),
-                    string(credentialsId: 'deploy-host', variable: 'DEPLOY_HOST')
-                ]) {
-                    script {
-                        sshagent([SSH_CREDENTIALS_ID]) {
-                            sh """
-                                ssh -o StrictHostKeyChecking=no ${DEPLOY_USER}@${DEPLOY_HOST} '
-                                    mkdir -p ${DEPLOY_PATH}
-                                '
+    steps {
+        withCredentials([
+            string(credentialsId: 'deploy-user', variable: 'DEPLOY_USER'),
+            string(credentialsId: 'deploy-host', variable: 'DEPLOY_HOST')
+        ]) {
+            script {
+                sshagent([SSH_CREDENTIALS_ID]) {
+                    sh """
+                        ssh -o StrictHostKeyChecking=no ${DEPLOY_USER}@${DEPLOY_HOST} '
+                            mkdir -p ${DEPLOY_PATH}
+                        '
 
-                                # Copy only nginx.conf to server
-                                scp ${SCRIPT} ${DEPLOY_USER}@${DEPLOY_HOST}:${DEPLOY_PATH}/docker-compose.yml
-                                scp ${NGINX_CONFIG} ${DEPLOY_USER}@${DEPLOY_HOST}:${DEPLOY_PATH}/nginx.conf
+                        scp ${SCRIPT} ${DEPLOY_USER}@${DEPLOY_HOST}:${DEPLOY_PATH}/docker-compose.yml
+                        scp ${NGINX_CONFIG} ${DEPLOY_USER}@${DEPLOY_HOST}:${DEPLOY_PATH}/nginx.conf
 
-                                # Run container using latest image and mounted nginx.conf
-                                echo "🚀 Deploying containers on remote server..."
-                                ssh -o StrictHostKeyChecking=no ${DEPLOY_USER}@${DEPLOY_HOST} '
-                                    set -e
-                                    cd ${DEPLOY_PATH} &&
-                                    docker-compose pull &&
-                                    docker-compose down &&
-                                    docker-compose up -d --remove-orphans
-                                '
-                            """
-                        }
-                    }
+                        echo "🚀 Deploying containers on remote server..."
+                        ssh -o StrictHostKeyChecking=no ${DEPLOY_USER}@${DEPLOY_HOST} '
+                            set -e
+                            cd ${DEPLOY_PATH} &&
+                            docker rm -f lv_app || true &&
+                            docker-compose pull &&
+                            docker-compose down &&
+                            docker-compose up -d --remove-orphans
+                        '
+                    """
                 }
             }
         }
+    }
+}
 
         stage('Cleanup') {
             steps {
