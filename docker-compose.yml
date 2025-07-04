@@ -4,6 +4,8 @@ services:
   app:
     image: ashwanidevops321/lv_app:latest
     container_name: lv_app
+    volumes:
+      - ./.env:/app/.env
     expose:
       - "9000"
     networks:
